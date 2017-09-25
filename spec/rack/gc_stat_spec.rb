@@ -27,9 +27,9 @@ RSpec.describe Rack::GCStats do
     end
   end
 
-  context 'return valid gc stats' do
+  context 'return valid gc stats with text' do
     subject do
-      Rack::Lint.new(Rack::GCStats.new(app, scoreboard_path: Dir.tmpdir))
+      Rack::Lint.new(Rack::GCStats.new(app, scoreboard_path: Dir.tmpdir, enable: true))
     end
     it do
       response = Rack::MockRequest.new(subject).get('/gc_stats')
@@ -38,14 +38,28 @@ RSpec.describe Rack::GCStats do
     end
   end
 
-  context 'return json valid server-status' do
+  context 'return json but not enabled' do
     subject do
       Rack::Lint.new(Rack::GCStats.new(app, scoreboard_path: Dir.tmpdir))
+    end
+    it do
+      Rack::MockRequest.new(subject).get('/')
+      response = Rack::MockRequest.new(subject).get('/gc_stats?json')
+      expect(response.successful?).to be_truthy
+      expect(response.headers['Content-Type']).to eq 'application/json; charset=utf-8'
+      expect(JSON.parse(response.body)['stats'].first.keys).to eq(['pid'])
+    end
+  end
+
+  context 'return json with enabled' do
+    subject do
+      Rack::Lint.new(Rack::GCStats.new(app, scoreboard_path: Dir.tmpdir, enabled: true))
     end
     it do
       response = Rack::MockRequest.new(subject).get('/gc_stats?json')
       expect(response.successful?).to be_truthy
       expect(response.headers['Content-Type']).to eq 'application/json; charset=utf-8'
+      expect(JSON.parse(response.body)['stats'].first.keys).to include('pid', 'minor_gc_count', 'major_gc_count')
     end
   end
 
