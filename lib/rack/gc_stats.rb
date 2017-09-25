@@ -21,6 +21,7 @@ module Rack
       # Return GC stats
       if env['PATH_INFO'] == @path
         update_gc_stat
+
         unless allowed?(env['REMOTE_ADDR'])
           return [403, {'Content-Type' => 'text/plain'}, [ 'Forbidden' ]]
         end
@@ -30,21 +31,13 @@ module Rack
 
         if @scoreboard
           stats = @scoreboard.read_all
-          all_workers = []
-          if !@skip_ps_command && RUBY_PLATFORM !~ /mswin(?!ce)|mingw|cygwin|bccwin/
-            parent_pid = Process.ppid
-            ps = `LC_ALL=C command ps -e -o ppid,pid`
-            ps.each_line do |line|
-              line.lstrip!
-              next if line =~ /^\D/
-              ppid, pid = line.chomp.split(/\s+/, 2)
-              all_workers << pid.to_i if ppid.to_i == parent_pid
-            end
-          else
-            all_workers = stats.keys
-          end
+          all_worker_pids = if !@skip_ps_command && RUBY_PLATFORM !~ /mswin(?!ce)|mingw|cygwin|bccwin/
+                              worker_pids_from_ps_command
+                            else
+                              stats.keys
+                            end
           process_gc_stats_list = []
-          all_workers.each do |pid|
+          all_worker_pids.each do |pid|
             json = stats[pid] || '{}'
             gc_status = JSON.parse(json, symbolize_names: true) rescue {}
             gc_status[:pid] ||= pid
@@ -85,6 +78,19 @@ module Rack
       gc_result[:time] = Time.now.to_i
       gc_result[:uptime] = @uptime
       @scoreboard.update(gc_result.to_json)
+    end
+
+    def worker_pids_from_ps_command
+      parent_pid = Process.ppid
+      all_worker_pids = []
+      ps = `LC_ALL=C command ps -e -o ppid,pid`
+      ps.each_line do |line|
+        line.lstrip!
+        next if line =~ /^\D/
+        ppid, pid = line.chomp.split(/\s+/, 2)
+        all_worker_pids << pid.to_i if ppid.to_i == parent_pid
+      end
+      all_worker_pids
     end
   end
 end

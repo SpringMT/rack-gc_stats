@@ -1,5 +1,5 @@
 require "bundler/setup"
-require "rack/gc_stat"
+require "rack/gc_stats"
 
 RSpec.configure do |config|
   # Enable flags like --only-failures and --next-failure

@@ -1,4 +1,4 @@
-# Rack::GcStat
+# Rack::GCStats [![Build Status](https://travis-ci.org/SpringMT/rack-gc_stats.svg?branch=master)](https://travis-ci.org/SpringMT/rack-gc_stats)
 
 Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/rack/gc_stat`. To experiment with that code, run `bin/console` for an interactive prompt.
 
@@ -9,7 +9,7 @@ TODO: Delete this and the text above, and describe your gem
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'rack-gc_stat'
+gem 'rack-gc_stats'
 ```
 
 And then execute:
@@ -18,7 +18,7 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install rack-gc_stat
+    $ gem install rack-gc_stats
 
 ## Usage
 
