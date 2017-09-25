@@ -5,7 +5,7 @@ require "rack/gc_stats/version"
 
 Gem::Specification.new do |spec|
   spec.name          = "rack-gc_stats"
-  spec.version       = Rack::GcStats::VERSION
+  spec.version       = Rack::GCStats::VERSION
   spec.authors       = ["SpringMT"]
   spec.email         = ["today.is.sky.blue.sky@gmail.com"]
 

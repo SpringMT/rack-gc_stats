@@ -3,7 +3,7 @@ require 'json'
 require 'worker_scoreboard'
 
 module Rack
-  class GcStats
+  class GCStats
     def initialize(app, options = {})
       @app = app
       @uptime = Time.now.to_i
