@@ -79,6 +79,7 @@ module Rack
       gc_result[:ppid] = Process.ppid
       gc_result[:time] = Time.now.to_i
       gc_result[:uptime] = @uptime
+      @scoreboard.update(gc_result.to_json)
     end
 
   end
