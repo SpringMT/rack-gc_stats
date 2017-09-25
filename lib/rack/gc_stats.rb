@@ -1,4 +1,4 @@
-require 'rack/gc_stat/version'
+require 'rack/gc_stats/version'
 require 'json'
 require 'worker_scoreboard'
 
