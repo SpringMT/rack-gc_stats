@@ -10,6 +10,7 @@ module Rack
       @skip_ps_command = options[:skip_ps_command] || false
       @allow = options[:allow] || []
       @path = options[:path] || '/gc_stats'
+      @enabled = options[:enabled] || false
       scoreboard_path  = options[:scoreboard_path]
       if scoreboard_path
         @scoreboard = WorkerScoreboard.new(scoreboard_path)
@@ -19,6 +20,7 @@ module Rack
     def call(env)
       # Return GC stats
       if env['PATH_INFO'] == @path
+        update_gc_stat
         unless allowed?(env['REMOTE_ADDR'])
           return [403, {'Content-Type' => 'text/plain'}, [ 'Forbidden' ]]
         end
@@ -28,7 +30,7 @@ module Rack
 
         if @scoreboard
           stats = @scoreboard.read_all
-          all_workers = stats.keys
+          all_workers = []
           if !@skip_ps_command && RUBY_PLATFORM !~ /mswin(?!ce)|mingw|cygwin|bccwin/
             parent_pid = Process.ppid
             ps = `LC_ALL=C command ps -e -o ppid,pid`
@@ -38,6 +40,8 @@ module Rack
               ppid, pid = line.chomp.split(/\s+/, 2)
               all_workers << pid.to_i if ppid.to_i == parent_pid
             end
+          else
+            all_workers = stats.keys
           end
           process_gc_stats_list = []
           all_workers.each do |pid|
@@ -73,6 +77,7 @@ module Rack
     end
 
     def update_gc_stat
+      return unless @enabled
       return unless @scoreboard
       gc_result = GC.stat
       gc_result[:pid] = Process.pid
@@ -81,6 +86,5 @@ module Rack
       gc_result[:uptime] = @uptime
       @scoreboard.update(gc_result.to_json)
     end
-
   end
 end
