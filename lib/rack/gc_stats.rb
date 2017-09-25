@@ -5,11 +5,15 @@ require 'worker_scoreboard'
 module Rack
   class GcStats
     def initialize(app, options = {})
-      @app  = app
+      @app = app
       @uptime = Time.now.to_i
       @skip_ps_command = options[:skip_ps_command] || false
       @allow = options[:allow] || []
-      @path = options[:path] || '/gc_stat'
+      @path = options[:path] || '/gc_stats'
+      scoreboard_path  = options[:scoreboard_path]
+      if scoreboard_path
+        @scoreboard = WorkerScoreboard.new(scoreboard_path)
+      end
     end
 
     def call(env)
@@ -22,7 +26,7 @@ module Rack
         body = ''
         status = {}
 
-        if !@scoreboard.nil?
+        if @scoreboard
           stats = @scoreboard.read_all
           all_workers = stats.keys
           if !@skip_ps_command && RUBY_PLATFORM !~ /mswin(?!ce)|mingw|cygwin|bccwin/
@@ -49,6 +53,7 @@ module Rack
           body << "WARN: Scoreboard has been disabled\n"
           status[:WARN] = 'Scoreboard has been disabled'
         end
+
         if (env['QUERY_STRING'] || '') =~ /\bjson\b/
           return [200, {'Content-Type' => 'application/json; charset=utf-8'}, [status.to_json]]
         end
@@ -68,7 +73,7 @@ module Rack
     end
 
     def update_gc_stat
-      return if @scoreboard.nil?
+      return unless @scoreboard
       gc_result = GC.stat
       gc_result[:pid] = Process.pid
       gc_result[:ppid] = Process.ppid
