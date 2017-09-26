@@ -22,7 +22,12 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+### Rackup files
+
+```
+# In config.ru
+use Rack::GCStats, scoreboard_path: './tmp', enabled: true
+```
 
 ## Development
 
