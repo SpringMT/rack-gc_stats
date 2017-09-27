@@ -29,6 +29,53 @@ Or install it yourself as:
 use Rack::GCStats, scoreboard_path: './tmp', enabled: true
 ```
 
+### Get GC Stats under Ruby 2.3.1
+
+Launch the rack server using 8080 port with Rack::GCStats.
+
+Then access gc_stats path(default: /gc_stats).
+
+When add `?json` query parameter, return JSON formatted response.
+
+```
+% curl -s localhost:8080/gc_stats?json | jq .
+{
+  "stats": [
+    {
+      "count": 30,
+      "heap_allocated_pages": 181,
+      "heap_sorted_length": 181,
+      "heap_allocatable_pages": 0,
+      "heap_available_slots": 73775,
+      "heap_live_slots": 73031,
+      "heap_free_slots": 744,
+      "heap_final_slots": 0,
+      "heap_marked_slots": 42416,
+      "heap_eden_pages": 181,
+      "heap_tomb_pages": 0,
+      "total_allocated_pages": 181,
+      "total_freed_pages": 0,
+      "total_allocated_objects": 332752,
+      "total_freed_objects": 259721,
+      "malloc_increase_bytes": 223552,
+      "malloc_increase_bytes_limit": 16777216,
+      "minor_gc_count": 26,
+      "major_gc_count": 4,
+      "remembered_wb_unprotected_objects": 328,
+      "remembered_wb_unprotected_objects_limit": 584,
+      "old_objects": 39244,
+      "old_objects_limit": 74280,
+      "oldmalloc_increase_bytes": 224000,
+      "oldmalloc_increase_bytes_limit": 16777216,
+      "pid": 40389,
+      "ppid": 40376,
+      "time": 1506525908,
+      "uptime": 1506525815
+    }
+  ]
+}
+```
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
