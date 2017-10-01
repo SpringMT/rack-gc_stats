@@ -37,15 +37,25 @@ module Rack
                               stats.keys
                             end
           process_gc_stats_list = []
+          total_gc_count = 0
+          total_minor_gc_count = 0
+          total_major_gc_count = 0
+
           all_worker_pids.each do |pid|
             json = stats[pid] || '{}'
             gc_status = JSON.parse(json, symbolize_names: true) rescue {}
             gc_status[:pid] ||= pid
             body << sprintf("%s\n", gc_status.to_s)
+            total_gc_count += gc_status[:count] || 0
+            total_minor_gc_count += gc_status[:minor_gc_count] || 0
+            total_major_gc_count += gc_status[:major_gc_count] || 0
             process_gc_stats_list << gc_status
           end
           body.chomp!
           status[:stats] = process_gc_stats_list
+          status[:total_gc_count] = total_gc_count
+          status[:total_minor_gc_count] = total_minor_gc_count
+          status[:total_major_gc_count] = total_major_gc_count
         else
           body << "WARN: Scoreboard has been disabled\n"
           status[:WARN] = 'Scoreboard has been disabled'
