@@ -40,6 +40,9 @@ When add `?json` query parameter, return JSON formatted response.
 ```
 % curl -s localhost:8080/gc_stats?json | jq .
 {
+  "total_gc_count": 32,
+  "total_minor_gc_count": 28,
+  "total_major_gc_count": 4,
   "stats": [
     {
       "count": 30,
