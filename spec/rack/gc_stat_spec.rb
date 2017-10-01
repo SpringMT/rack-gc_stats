@@ -56,11 +56,15 @@ RSpec.describe Rack::GCStats do
       Rack::Lint.new(Rack::GCStats.new(app, scoreboard_path: Dir.tmpdir, enabled: true))
     end
     it do
+      Rack::MockRequest.new(subject).get('/')
       response = Rack::MockRequest.new(subject).get('/gc_stats?json')
       expect(response.successful?).to be_truthy
       expect(response.headers['Content-Type']).to eq 'application/json; charset=utf-8'
       expect(JSON.parse(response.body)['stats'].first.keys).to include('pid', 'minor_gc_count', 'major_gc_count')
+      expect(JSON.parse(response.body)['total_gc_count']).to be > 0
+      expect(JSON.parse(response.body)['total_minor_gc_count']).to be > 0
+      expect(JSON.parse(response.body)['total_major_gc_count']).to be > 0
     end
   end
-
 end
+
